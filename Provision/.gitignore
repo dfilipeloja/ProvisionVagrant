@@ -1,0 +1,7 @@
+*.log
+.vagrant/
+*.cfg
+*.inv
+*.json
+hashed_password
+.venv/

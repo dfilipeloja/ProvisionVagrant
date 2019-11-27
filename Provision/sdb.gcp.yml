@@ -1,0 +1,10 @@
+plugin: gcp_compute
+projects:
+  - sdb1920
+regions:
+  - europe-north1-a
+hostnames:
+  - name
+filters: []
+auth_kind: serviceaccount
+service_account_file: credentials.json

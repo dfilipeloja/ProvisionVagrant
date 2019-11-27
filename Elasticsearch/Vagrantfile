@@ -1,0 +1,45 @@
+PUBLIC_KEY = File.read(File.expand_path('~/.ssh/id_rsa.pub')).strip
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/xenial64"
+    config.vm.network "public_network", bridge: "wlp3s0"
+
+    config.vm.define "elasticsearch" do |elasticsearch|  
+        elasticsearch.vm.network "private_network", ip: "10.0.0.110"
+
+        elasticsearch.vm.provider "virtualbox" do |vb|
+            vb.name = "elasticsearch"
+            vb.gui = false
+            vb.memory = 2048
+            vb.cpus = 1
+        end
+
+        elasticsearch.vm.provision "shell", inline: <<-SHELL
+            wget -c https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.4.2-linux-x86_64.tar.gz
+            wget -c https://artifacts.elastic.co/downloads/kibana/kibana-7.4.2-linux-x86_64.tar.gz
+        SHELL
+    
+    end
+
+     config.vm.define "metricbeat" do |metricbeat|  
+        metricbeat.vm.network "private_network", ip: "10.0.0.111"
+
+        metricbeat.vm.provider "virtualbox" do |vb|
+            vb.name = "metricbeat"
+            vb.gui = false
+            vb.memory = 512
+            vb.cpus = 1
+        end
+
+        metricbeat.vm.provision "shell", inline: <<-SHELL
+            wget https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.4.2-linux-x86_64.tar.gz
+        SHELL
+    end  
+ 
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update -y
+        apt-get install vim -y
+        apt-get install aptitude -y
+        echo "#{PUBLIC_KEY}" >> /home/vagrant/.ssh/authorized_keys
+    SHELL
+end

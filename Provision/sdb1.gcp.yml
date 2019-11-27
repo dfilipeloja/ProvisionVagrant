@@ -1,0 +1,12 @@
+plugin: gcp_compute
+projects:
+  - sdb1920
+zones:
+  - europe-north1-a
+filters: []
+keyed_groups:
+  - prefix: ''
+    separator: ''
+    key: labels
+auth_kind: serviceaccount
+service_account_file: credentials.json

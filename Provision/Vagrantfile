@@ -1,0 +1,29 @@
+PUBLIC_KEY = File.read(File.expand_path('~/.ssh/id_rsa.pub')).strip
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/xenial64"
+    config.vm.network "public_network", bridge: "wlp3s0"
+
+    config.vm.define "ansible" do |ansible|  
+        ansible.vm.network "private_network", ip: "10.0.0.105"
+
+        ansible.vm.provider "virtualbox" do |vb|
+            vb.name = "ansiblevbox"
+            vb.gui = false
+            vb.memory = 512
+            vb.cpus = 1
+        end
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get install aptitude -y
+        echo "#{PUBLIC_KEY}" >> /home/vagrant/.ssh/authorized_keys     
+    SHELL
+
+    config.vm.provision "ansible" do |ansible|
+        ansible.raw_arguments = [
+            "-e ansible_python_interpreter=/usr/bin/python3"
+        ]
+        ansible.playbook = "playbook.yml"
+    end
+end
